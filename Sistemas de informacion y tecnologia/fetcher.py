@@ -52,17 +52,31 @@ def get_resource(resource, subresource='', params=None):
     # TODO y luego ir a buscar los contenidos de dicha URL
     # TODO importante tener en cuenta el manejo de errores, en caso de que falle el request
     
-    category = params['category']
-    
-    if 'offset' in params:
+    if  'item_id' in params:
+
+        item_id = params['item_id']
+
+        if 'offset' in params:
+
+            offset = str(params['offset'])
+            result = requests.get(MELI_BASE_URL + '/' + resource + '/' + item_id + '?offset=' + offset)
         
-        offset = params['offset']
-        result = requests.get(MELI_BASE_URL + "/" + resource +  "?category=" + category + '&offset=' 
-                          + offset)
+        else:
+            result = requests.get(MELI_BASE_URL + '/' + resource + '/' + item_id)
     
     else:
-        result = requests.get(MELI_BASE_URL + "/" + resource +  "?category=" + category)
-    
+        
+        category = params['category']
+        
+        if 'offset' in params:
+            
+            offset = str(params['offset'])
+            result = requests.get(MELI_BASE_URL + "/" + resource +  "?category=" + category + '&offset=' 
+                            + offset)
+        
+        else:
+            result = requests.get(MELI_BASE_URL + "/" + resource +  "?category=" + category)
+        
     return result.json()
 
 
@@ -120,8 +134,19 @@ def get_item_reviews(item_id):
     :return: list of Reviews
     """
 
+    params = {
+
+        'item_id':item_id
+    }
+    print(f'Getting items from item {item_id}')
+    pages = get_resource_paginated(MELI_REVIEWS_RESOURCE, params = params)
+
+    reviews = []
+    for review in pages['reviews']:
+        reviews.append(Review(key=review['id'], title=review['title'], content=review['content'], rate=review['rate'], likes=review['likes'], dislikes=review['dislikes']))
+
     # TODO aquí deberíamos retornar un objeto Review por cada review del ítem
-    return []
+    return reviews
 
 
 def get_page_items(page, reviews_goal, max_reviews_per_item):
