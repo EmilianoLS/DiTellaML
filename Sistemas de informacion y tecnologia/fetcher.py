@@ -139,12 +139,20 @@ def get_item_reviews(item_id):
         'item_id':item_id
     }
     print(f'Getting items from item {item_id}')
-    pages = get_resource_paginated(MELI_REVIEWS_RESOURCE, params = params)
-
+    
     reviews = []
-    for review in pages['reviews']:
-        reviews.append(Review(key=review['id'], title=review['title'], content=review['content'], rate=review['rate'], likes=review['likes'], dislikes=review['dislikes']))
-
+    
+    for page in get_resource_paginated(MELI_REVIEWS_RESOURCE, params = params):
+        
+        for review in page['reviews']:
+                    
+            reviews.append(Review(key      = review['id'], 
+                                  title    = review['title'], 
+                                  content  = review['content'], 
+                                  rate     = review['rate'], 
+                                  likes    = review['likes'], 
+                                  dislikes = review['dislikes']))
+            
     # TODO aquí deberíamos retornar un objeto Review por cada review del ítem
     return reviews
 
@@ -189,7 +197,7 @@ def visit_items_with_reviews(category, output_directory, reviews_goal, max_revie
                                               max_reviews_per_item=max_reviews_per_item)
         total_reviews += reviews_count
 
-        store_items_with_reviews(items, category, i, output_directory)
+        #store_items_with_reviews(items, category, i, output_directory)
 
         if total_reviews >= reviews_goal:
             break
