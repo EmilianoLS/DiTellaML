@@ -123,7 +123,8 @@ def store_items_with_reviews(items, category, page_num, output_directory):
 
     # TODO luego debemos guardarla en 'output_directory' en formato parquet 
     # TODO el nombre de archivo debe reflejar categoría y número de página
-    pass
+    
+    table = pyarrow.Table.from_pandas()
 
 
 def get_item_reviews(item_id):
@@ -197,7 +198,7 @@ def visit_items_with_reviews(category, output_directory, reviews_goal, max_revie
                                               max_reviews_per_item=max_reviews_per_item)
         total_reviews += reviews_count
 
-        #store_items_with_reviews(items, category, i, output_directory)
+        store_items_with_reviews(items, category, i, output_directory)
 
         if total_reviews >= reviews_goal:
             break
@@ -211,7 +212,7 @@ def main():
     parser.add_argument('--reviews-goal', type=int, default=50000, help='Target number of reviews to fetch')
     parser.add_argument('--max-reviews-per-item', type=int, default=100, help='Maximum number of reviews per item')
 
-    args = parser.parse_args()
+    args = parser.parse_args(['--category','MLA5725'])
 
     # Create output directory if it does not yet exist
     Path(args.output_directory).mkdir(exist_ok=True)
