@@ -120,7 +120,6 @@ def store_items_with_reviews(items, category, page_num, output_directory):
     :param output_directory: directory where to store the data
     """
     # TODO aquí debemos construir una vista columnar de las reviews
-
     # TODO luego debemos guardarla en 'output_directory' en formato parquet 
     # TODO el nombre de archivo debe reflejar categoría y número de página
     
@@ -220,6 +219,6 @@ def main():
     # Visit all the Category Reviews
     visit_items_with_reviews(args.category, args.output_directory, args.reviews_goal, args.max_reviews_per_item)
 
-
+hola mati
 if __name__ == '__main__':
     main()
