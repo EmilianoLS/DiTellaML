@@ -1,10 +1,11 @@
 import argparse
 import math
 from pathlib import Path
-
+import pandas
 import pyarrow
 import pyarrow.parquet
 import requests
+import pandas
 
 # Some useful constants
 MELI_BASE_URL = 'https://api.mercadolibre.com'
@@ -122,9 +123,25 @@ def store_items_with_reviews(items, category, page_num, output_directory):
     # TODO aquí debemos construir una vista columnar de las reviews
     # TODO luego debemos guardarla en 'output_directory' en formato parquet 
     # TODO el nombre de archivo debe reflejar categoría y número de página
-    
-    table = pyarrow.Table.from_pandas()
+    df = pandas.DataFrame({'Id': [],
+                   'Title': [],
+                   'Content': [],
+                   'Rate': [],
+                   'Likes': [],
+                   'Dislakes': []})
 
+    for item in items:
+        for review in item.reviews:
+            df = df.append({'Id': [review.key],
+                       'Title': [review.title],
+                       'Content': [review.content],
+                       'Rate': [review.rate],
+                       'Likes': [review.likes],
+                       'Dislakes': [review.dislikes]}, True)
+    table = pyarrow.Table.from_pandas(df)
+
+    pyarrow.parquet.write_table(table, category + str(page_num))
+    
 
 def get_item_reviews(item_id):
     """
@@ -197,11 +214,11 @@ def visit_items_with_reviews(category, output_directory, reviews_goal, max_revie
                                               max_reviews_per_item=max_reviews_per_item)
         total_reviews += reviews_count
 
-        store_items_with_reviews(items, category, i, output_directory)
+        a = store_items_with_reviews(items, category, i, output_directory)
 
         if total_reviews >= reviews_goal:
             break
-
+    return a
 
 def main():
     # Parse the command line arguments
@@ -217,8 +234,9 @@ def main():
     Path(args.output_directory).mkdir(exist_ok=True)
 
     # Visit all the Category Reviews
-    visit_items_with_reviews(args.category, args.output_directory, args.reviews_goal, args.max_reviews_per_item)
+    a = visit_items_with_reviews(args.category, args.output_directory, args.reviews_goal, args.max_reviews_per_item)
+    return a
 
-hola mati
 if __name__ == '__main__':
-    main()
+    a = main()
+print(a)
