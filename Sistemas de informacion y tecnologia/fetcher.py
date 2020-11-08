@@ -104,7 +104,7 @@ def get_resource_paginated(resource, subresource='', params=None, page_limit=50)
         paging = data['paging']
         total = paging['total']
         limit = paging['limit']
-        for page in range(1, math.ceil(total/limit)):
+        for page in range(1, min(math.ceil(total/limit),20)):
             params.update({
                 'offset': page*limit
             })
@@ -140,7 +140,7 @@ def store_items_with_reviews(items, category, page_num, output_directory):
                             'Dislakes': [review.dislikes]}, True)
     table = pyarrow.Table.from_pandas(df)
 
-    pyarrow.parquet.write_table(table, category + str(page_num))
+    pyarrow.parquet.write_table(table, output_directory + '/' + category + str(page_num) + '.parquet')
     
 
 def get_item_reviews(item_id):
@@ -225,7 +225,7 @@ def main():
     parser = argparse.ArgumentParser(description='MeLi data fetcher')
     parser.add_argument('--category', required=True, help='Product category to fetch')
     parser.add_argument('--output-directory', default='reviews', help='Directory where to store the data')
-    parser.add_argument('--reviews-goal', type=int, default=50000, help='Target number of reviews to fetch')
+    parser.add_argument('--reviews-goal', type=int, default=15000, help='Target number of reviews to fetch')
     parser.add_argument('--max-reviews-per-item', type=int, default=100, help='Maximum number of reviews per item')
 
     args = parser.parse_args(['--category','MLA5725'])
