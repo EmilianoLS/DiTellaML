@@ -124,20 +124,20 @@ def store_items_with_reviews(items, category, page_num, output_directory):
     # TODO luego debemos guardarla en 'output_directory' en formato parquet 
     # TODO el nombre de archivo debe reflejar categoría y número de página
     df = pandas.DataFrame({'Id': [],
-                   'Title': [],
-                   'Content': [],
-                   'Rate': [],
-                   'Likes': [],
-                   'Dislakes': []})
+                            'Title': [],
+                            'Content': [],
+                            'Rate': [],
+                            'Likes': [],
+                            'Dislakes': []})
 
     for item in items:
         for review in item.reviews:
             df = df.append({'Id': [review.key],
-                       'Title': [review.title],
-                       'Content': [review.content],
-                       'Rate': [review.rate],
-                       'Likes': [review.likes],
-                       'Dislakes': [review.dislikes]}, True)
+                            'Title': [review.title],
+                            'Content': [review.content],
+                            'Rate': [review.rate],
+                            'Likes': [review.likes],
+                            'Dislakes': [review.dislikes]}, True)
     table = pyarrow.Table.from_pandas(df)
 
     pyarrow.parquet.write_table(table, category + str(page_num))
