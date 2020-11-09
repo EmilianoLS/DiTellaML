@@ -5,7 +5,6 @@ import pandas
 import pyarrow
 import pyarrow.parquet
 import requests
-import pandas
 
 # Some useful constants
 MELI_BASE_URL = 'https://api.mercadolibre.com'
@@ -78,6 +77,8 @@ def get_resource(resource, subresource='', params=None):
         else:
             result = requests.get(MELI_BASE_URL + "/" + resource +  "?category=" + category)
         
+    
+    result.raise_for_status()
     return result.json()
 
 
@@ -137,7 +138,7 @@ def store_items_with_reviews(items, category, page_num, output_directory):
                             'Content': [review.content],
                             'Rate': [review.rate],
                             'Likes': [review.likes],
-                            'Dislakes': [review.dislikes]}, True)
+                            'Dislikes': [review.dislikes]}, True)
     table = pyarrow.Table.from_pandas(df)
 
     pyarrow.parquet.write_table(table, output_directory + '/' + category + str(page_num) + '.parquet')
@@ -227,14 +228,17 @@ def main():
     parser.add_argument('--output-directory', default='reviews', help='Directory where to store the data')
     parser.add_argument('--reviews-goal', type=int, default=15000, help='Target number of reviews to fetch')
     parser.add_argument('--max-reviews-per-item', type=int, default=100, help='Maximum number of reviews per item')
-
-    args = parser.parse_args(['--category','MLA5725'])
-
-    # Create output directory if it does not yet exist
-    Path(args.output_directory).mkdir(exist_ok=True)
-
-    # Visit all the Category Reviews
-    a = visit_items_with_reviews(args.category, args.output_directory, args.reviews_goal, args.max_reviews_per_item)
+    
+    categories = ['MLA5725', "MLA1743", "MLA1039", "MLA1051", "MLA1000"]
+    
+    for category in categories:
+        args = parser.parse_args(['--category',category])
+    
+        # Create output directory if it does not yet exist
+        Path(args.output_directory).mkdir(exist_ok=True)
+    
+        # Visit all the Category Reviews
+        a = visit_items_with_reviews(args.category, args.output_directory, args.reviews_goal, args.max_reviews_per_item)
     return a
 
 if __name__ == '__main__':
