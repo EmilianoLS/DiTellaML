@@ -129,7 +129,7 @@ def store_items_with_reviews(items, category, page_num, output_directory):
                             'Content': [],
                             'Rate': [],
                             'Likes': [],
-                            'Dislakes': []})
+                            'Dislikes': []})
 
     for item in items:
         for review in item.reviews:
