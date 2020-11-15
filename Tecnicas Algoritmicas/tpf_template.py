@@ -10,8 +10,18 @@ def asignar_random(prefs):
         sol.asignar(e, t)
     return sol
 
-#def asignar_greedy(prefs):
-#   COMPLETAR
+def asignar_greedy(prefs):
+    
+    sol = Planilla(prefs)
+    
+    for student in sol.estudiantes_sin_topico():
+                
+        for topic in prefs.preferencias_del_estudiante(student):
+    
+            if sol.topico_libre(topic) and sol.estudiante_libre(student):                
+                sol.asignar(student, topic)
+    return sol
+
 #
 #def asignar_bl(prefs, solucion_inicial):
 #   COMPLETAR
@@ -25,12 +35,12 @@ def asignar_random(prefs):
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Cargo un ejemplo de preferencias.
-prefs = Preferencias("Ejemplo3")
+prefs = Preferencias("Ejemplo50")
 
 # Busco una asignación completa (con un algoritmo aleatorio en este caso),
 # calculando el tiempo de ejecución.
 comienzo = datetime.now()
-solucion = asignar_random(prefs)
+solucion = asignar_greedy(prefs)
 tiempo_usado = datetime.now() - comienzo
 
 # Imprimo un resumen de los resultados.
