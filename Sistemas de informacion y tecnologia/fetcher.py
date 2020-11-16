@@ -124,7 +124,7 @@ def store_items_with_reviews(items, category, page_num, output_directory):
     # TODO aquí debemos construir una vista columnar de las reviews
     # TODO luego debemos guardarla en 'output_directory' en formato parquet 
     # TODO el nombre de archivo debe reflejar categoría y número de página
-    df = pandas.DataFrame({'Id': [],
+    df = pandas.DataFrame({ 'Id': [],
                             'Title': [],
                             'Content': [],
                             'Rate': [],
@@ -133,12 +133,12 @@ def store_items_with_reviews(items, category, page_num, output_directory):
 
     for item in items:
         for review in item.reviews:
-            df = df.append({'Id': [review.key],
-                            'Title': [review.title],
-                            'Content': [review.content],
-                            'Rate': [review.rate],
-                            'Likes': [review.likes],
-                            'Dislikes': [review.dislikes]}, True)
+            df = df.append({'Id': review.key,
+                            'Title': review.title,
+                            'Content': review.content,
+                            'Rate': review.rate,
+                            'Likes': review.likes,
+                            'Dislikes': review.dislikes}, True)
     table = pyarrow.Table.from_pandas(df)
 
     pyarrow.parquet.write_table(table, output_directory + '/' + category + str(page_num) + '.parquet')
@@ -229,8 +229,9 @@ def main():
     parser.add_argument('--reviews-goal', type=int, default=15000, help='Target number of reviews to fetch')
     parser.add_argument('--max-reviews-per-item', type=int, default=100, help='Maximum number of reviews per item')
     
-    categories = ['MLA5725', "MLA1743", "MLA1039", "MLA1051", "MLA1000"]
+    #categories = ['MLA5725', "MLA1743", "MLA1039", "MLA1051", "MLA1000"]
     
+    categories = ['MLA5725']
     for category in categories:
         args = parser.parse_args(['--category',category])
     
