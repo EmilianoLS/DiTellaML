@@ -53,31 +53,6 @@ def get_resource(resource, subresource='', params=None):
     # TODO importante tener en cuenta el manejo de errores, en caso de que falle el request
     
     result = requests.get(MELI_BASE_URL + '/' + resource + '/' + subresource, params = params)
-    #if  'item_id' in params:
-
-     #   item_id = params['item_id']
-
-      #  if 'offset' in params:
-
-       #     offset = str(params['offset'])
-       #     result = requests.get(MELI_BASE_URL + '/' + resource + '/' + item_id + '?offset=' + offset)
-        
-       # else:
-       #     result = requests.get(MELI_BASE_URL + '/' + resource + '/' + item_id)
-    
-    #else:
-        
-    #    category = params['category']
-        
-    #    if 'offset' in params:
-            
-    #        offset = str(params['offset'])
-    #        result = requests.get(MELI_BASE_URL + "/" + resource +  "?category=" + category + '&offset=' 
-    #                        + offset)
-        
-    #    else:
-    #        result = requests.get(MELI_BASE_URL + "/" + resource +  "?category=" + category)
-        
     
     result.raise_for_status()
     return result.json()
@@ -134,12 +109,12 @@ def store_items_with_reviews(items, category, page_num, output_directory):
 
     for item in items:
         for review in item.reviews:
-            df = df.append({'Id': [review.key],
-                            'Title': [review.title],
-                            'Content': [review.content],
-                            'Rate': [review.rate],
-                            'Likes': [review.likes],
-                            'Dislikes': [review.dislikes]}, True)
+            df = df.append({'Id': review.key,
+                            'Title': review.title,
+                            'Content': review.content,
+                            'Rate': review.rate,
+                            'Likes': review.likes,
+                            'Dislikes': review.dislikes}, True)
     table = pyarrow.Table.from_pandas(df)
 
     pyarrow.parquet.write_table(table, output_directory + '/' + category + str(page_num) + '.parquet')
@@ -227,9 +202,8 @@ def main():
     parser.add_argument('--reviews-goal', type=int, default=15000, help='Target number of reviews to fetch')
     parser.add_argument('--max-reviews-per-item', type=int, default=100, help='Maximum number of reviews per item')
     
-    #categories = ['MLA5725', "MLA1743", "MLA1039", "MLA1051", "MLA1000"]
+    categories = ['MLA5725', "MLA1743", "MLA1039", "MLA1051", "MLA1000"]
     
-    categories = ['MLA5725']
     for category in categories:
         args = parser.parse_args(['--category',category])
     
