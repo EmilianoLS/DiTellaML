@@ -10,7 +10,7 @@ import requests
 MELI_BASE_URL = 'https://api.mercadolibre.com'
 
 MELI_ITEMS_RESOURCE = 'sites/MLA/search'
-MELI_REVIEWS_RESOURCE = 'reviews/item'
+MELI_REVIEWS_RESOURCE = 'reviews'
 
 
 class Item:
@@ -52,30 +52,31 @@ def get_resource(resource, subresource='', params=None):
     # TODO y luego ir a buscar los contenidos de dicha URL
     # TODO importante tener en cuenta el manejo de errores, en caso de que falle el request
     
-    if  'item_id' in params:
+    result = requests.get(MELI_BASE_URL + '/' + resource + '/' + subresource, params = params)
+    #if  'item_id' in params:
 
-        item_id = params['item_id']
+     #   item_id = params['item_id']
 
-        if 'offset' in params:
+      #  if 'offset' in params:
 
-            offset = str(params['offset'])
-            result = requests.get(MELI_BASE_URL + '/' + resource + '/' + item_id + '?offset=' + offset)
+       #     offset = str(params['offset'])
+       #     result = requests.get(MELI_BASE_URL + '/' + resource + '/' + item_id + '?offset=' + offset)
         
-        else:
-            result = requests.get(MELI_BASE_URL + '/' + resource + '/' + item_id)
+       # else:
+       #     result = requests.get(MELI_BASE_URL + '/' + resource + '/' + item_id)
     
-    else:
+    #else:
         
-        category = params['category']
+    #    category = params['category']
         
-        if 'offset' in params:
+    #    if 'offset' in params:
             
-            offset = str(params['offset'])
-            result = requests.get(MELI_BASE_URL + "/" + resource +  "?category=" + category + '&offset=' 
-                            + offset)
+    #        offset = str(params['offset'])
+    #        result = requests.get(MELI_BASE_URL + "/" + resource +  "?category=" + category + '&offset=' 
+    #                        + offset)
         
-        else:
-            result = requests.get(MELI_BASE_URL + "/" + resource +  "?category=" + category)
+    #    else:
+    #        result = requests.get(MELI_BASE_URL + "/" + resource +  "?category=" + category)
         
     
     result.raise_for_status()
@@ -133,12 +134,12 @@ def store_items_with_reviews(items, category, page_num, output_directory):
 
     for item in items:
         for review in item.reviews:
-            df = df.append({'Id': review.key,
-                            'Title': review.title,
-                            'Content': review.content,
-                            'Rate': review.rate,
-                            'Likes': review.likes,
-                            'Dislikes': review.dislikes}, True)
+            df = df.append({'Id': [review.key],
+                            'Title': [review.title],
+                            'Content': [review.content],
+                            'Rate': [review.rate],
+                            'Likes': [review.likes],
+                            'Dislikes': [review.dislikes]}, True)
     table = pyarrow.Table.from_pandas(df)
 
     pyarrow.parquet.write_table(table, output_directory + '/' + category + str(page_num) + '.parquet')
@@ -152,15 +153,12 @@ def get_item_reviews(item_id):
     :return: list of Reviews
     """
 
-    params = {
-
-        'item_id':item_id
-    }
     print(f'Getting items from item {item_id}')
     
+    subresource = 'item' + '/' + item_id
     reviews = []
     
-    for page in get_resource_paginated(MELI_REVIEWS_RESOURCE, params = params):
+    for page in get_resource_paginated(MELI_REVIEWS_RESOURCE,subresource):
         
         for review in page['reviews']:
                     
