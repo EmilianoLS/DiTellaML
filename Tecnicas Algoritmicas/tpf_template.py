@@ -75,7 +75,7 @@ def asignar_bl(prefs, solucion_inicial):
                 
                 for topic in range(student+1,len(topics_to_change)):
                     
-                    vecino = solucion_actual.copy()
+                    vecino = solucion_inicial.copy()
                     
                     # Encuentro el topico asignado al estudiante 'e'
                     # assigned_topic es EL topico, no es un indice
@@ -111,21 +111,34 @@ def asignar_bl(prefs, solucion_inicial):
                 #print('Costo solucion actual: ', costo_solucion_actual)
                 #print('Costo mejor vecino: ', costo_mejor_vecino)
                 pudimos_mejorar = True
-                solucion_actual = mejor_vecino
+                solucion_inicial = mejor_vecino
                 costo_solucion_actual = costo_mejor_vecino
                 # Vuelvo a encontrar los estudiantes que intercambiaran topicos
-                students_to_change, topics_to_change = find_students_topics_to_change(solucion_actual, prefs)
+                students_to_change, topics_to_change = find_students_topics_to_change(solucion_inicial, prefs)
             else:
                 pudimos_mejorar = False
         
-        return solucion_actual
+        return solucion_inicial
             
     else:
-        print('La solucion ya es optima!')
+        return solucion_inicial
 
-#
-#def asignar_bli(prefs, iters):
-#   COMPLETAR
+def asignar_bli(prefs, iters):
+
+    costo_solucion = float('inf')
+    solucion_final = None
+
+    for iteration in range(0, iters):
+        print('Iteration number: ', iteration)
+        solucion_actual = asignar_random(prefs)
+        solucion_bl = asignar_bl(prefs, solucion_actual)
+
+        if solucion_bl.calcular_costo() < costo_solucion:
+
+            costo_solucion = solucion_bl.calcular_costo()
+            solucion_final = solucion_bl
+
+    return solucion_final
 #
 #def asignar_backtracking(prefs):
 #   COMPLETAR
@@ -162,7 +175,20 @@ for example in examples:
     # Busqueda Local Algorithm
 
     # Determino una primera solucion con la heurísitica 'greedy'
+    comienzo = datetime.now()
     solucion_actual = asignar_greedy(prefs)
+    solucion_bl = asignar_bl(prefs, solucion_actual)
+    tiempo_usado = datetime.now() - comienzo
+    results[example].update({'Bl Algorithm':{'Costo': solucion_bl.calcular_costo(),
+                                            'Tiempo usado': tiempo_usado}})
+
+    # Busqueda Local Iterativa Algorithm
+
+    comienzo = datetime.now()
+    solucion = asignar_bli(prefs, 50)
+    tiempo_usado = datetime.now() - comienzo
+    results[example].update({'Bli Algorithm':{'Costo': solucion.calcular_costo(),
+                                            'Tiempo usado': tiempo_usado}})
 
 print(results)
 
