@@ -117,7 +117,7 @@ def store_items_with_reviews(items, category, page_num, output_directory):
                             'Dislikes': review.dislikes}, True)
     table = pyarrow.Table.from_pandas(df)
 
-    pyarrow.parquet.write_table(table, output_directory + '/' + category + str(page_num) + '.parquet')
+    pyarrow.parquet.write_table(table, output_directory + '/' + category + '_' + str(page_num) + '.parquet')
     
 
 def get_item_reviews(item_id):
