@@ -3,8 +3,15 @@
 import glob
 import os
 import sys
+import re
+from unidecode import unidecode
 from pyarrow import parquet
 from nltk import word_tokenize
+from nltk.corpus import stopwords
+
+#stopword list to use
+spanish_stopwords = stopwords.words('spanish')
+
 
 def category_from_filename(filename):
     """
@@ -43,13 +50,13 @@ class Review:
         # TODO: reemplazar o ajustar el resto de este método para que extraiga las características del review
         #       según los nombres de columnas que hay en sus archivos parquet
         return Review(
-            key=record['id'],
+            key=record['Id'],
             category=category,
-            title=record['title'],
-            content=record['content'],
-            rate=record['rate'],
-            likes=record['likes'],
-            dislikes=record['dislikes']
+            title=record['Title'],
+            content=record['Content'],
+            rate=record['Rate'],
+            likes=record['Likes'],
+            dislikes=record['Dislikes']
         )   
 
 
@@ -62,7 +69,7 @@ def accept(term):
     """
     # TODO implementar acá un filtro que devuelve True sólo para las palabras de interés,
     #      por ejemplo, eliminando STOPWORDS o filtrando sólo palabras alfanuméricas.
-    if term in stopwords.words('spanish'):
+    if term in spanish_stopwords:
         
         return False
 
@@ -80,7 +87,8 @@ def sanitize(word):
     """
     # TODO: normalizar la palabra aquí, por ejemplo pasar a minúsculas y eliminar espacios extra
     word = word.lower()
-    word = word.translate(string.maketrans(“”,””), string.punctuation)
+    word = re.sub(r'[^\w\s]', '', word) 
+    word = unidecode(word)
     word = word.strip()
 
     return word
