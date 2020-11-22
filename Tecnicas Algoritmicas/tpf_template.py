@@ -140,8 +140,54 @@ def asignar_bli(prefs, iters):
 
     return solucion_final
 #
-#def asignar_backtracking(prefs):
-#   COMPLETAR
+def asignar_backtracking(prefs):
+    
+    # Funcion de busqueda por fuerza bruta 
+    # Creamos un objeto de tipo Planilla
+    sol = Planilla(prefs)
+    # Hallamos la solucion llamando una funcion auxiliar
+    solucion = asignar_backtracking_aux(sol) 
+    
+    return solucion
+
+def asignar_backtracking_aux(sol):
+    
+    best_assignment = None
+    costo = float('inf')  # infinito
+    # Caso base: No queda ningun estudiante desasignado
+
+    if len(sol.estudiantes_sin_topico()) == 0:
+
+        # Guardo la solucion actual y calculo su costo
+        best_assignment = sol.copy()
+        costo = best_assignment.calcular_costo()
+
+
+    else:
+        # Todavia estan quedando estudiantes sin nigun topico asignado
+        # Para cada estudiante sin topico recorro todos los topicos posibles que no esten asignados
+        for student in sol.estudiantes_sin_topico().copy():
+
+            for topic in sol.topicos_sin_estudiante().copy():
+                
+                sol.asignar(student, topic)
+                
+                # Introduzco la recursividad al rellamara la funcion                 
+                solucion_temp = asignar_backtracking_aux(sol)
+                
+                costo_temp = solucion_temp.calcular_costo()
+
+                # Si esta asignacion es la que menor costo reporta, la guardamos
+    
+                if costo_temp < costo:
+                   
+                   best_assignment = solucion_temp
+                   costo = costo_temp 
+                
+                # Paso para atras 
+    
+                sol.desasignar(student, topic)
+    return best_assignment
 
 #def testing_algoritmos():
 
@@ -189,8 +235,12 @@ for example in examples:
     tiempo_usado = datetime.now() - comienzo
     results[example].update({'Bli Algorithm':{'Costo': solucion.calcular_costo(),
                                             'Tiempo usado': tiempo_usado}})
+    
+    
 
 print(results)
+
+
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

@@ -55,52 +55,64 @@ def find_students_topics_to_change(solution, prefs):
     return students_to_change, topics_to_change
 
 
-# Cargo un ejemplo de preferencias.
-prefs = Preferencias("Ejemplo3")
-sol = Planilla(prefs)
 
-def asignar_backtracking(sol):
+#sol = Planilla(prefs)
 
+def asignar_backtracking(prefs):
+    # Funcion de busqueda por fuerza bruta 
+    # Creamos un objeto de tipo Planilla
+    sol = Planilla(prefs)
+    # Hallamos la solucion llamando una funcion auxiliar
+    solucion = asignar_backtracking_aux(sol) 
+    
+    return solucion
+
+def asignar_backtracking_aux(sol):
+    
     best_assignment = None
     costo = float('inf')  # infinito
     # Caso base: No queda ningun estudiante desasignado
 
     if len(sol.estudiantes_sin_topico()) == 0:
 
-        #print('No more students left')
+        # Guardo la solucion actual y calculo su costo
         best_assignment = sol.copy()
         costo = best_assignment.calcular_costo()
 
+
     else:
         # Todavia estan quedando estudiantes sin nigun topico asignado
-
-        #print('There are still some students missing!')
+        # Para cada estudiante sin topico recorro todos los topicos posibles que no esten asignados
         for student in sol.estudiantes_sin_topico().copy():
-            print('Student: ', student)
+
             for topic in sol.topicos_sin_estudiante().copy():
-                print('Topic: ', topic)
+                
                 sol.asignar(student, topic)
-                print('Estudiante ', student, 'asignado al topico ')
-                solucion_temp = asignar_backtracking(sol)
+                
+                # Introduzco la recursividad al rellamara la funcion                 
+                solucion_temp = asignar_backtracking_aux(sol)
+                
                 costo_temp = solucion_temp.calcular_costo()
 
                 # Si esta asignacion es la que menor costo reporta, la guardamos
-
+    
                 if costo_temp < costo:
                    
                    best_assignment = solucion_temp
                    costo = costo_temp 
                 
                 # Paso para atras 
-
-                sol.desasignar(student, topic)
     
+                sol.desasignar(student, topic)
     return best_assignment
 
+# Cargo un ejemplo de preferencias.
 
-solucion = asignar_backtracking(sol)
+prefs = Preferencias("Ejemplo10")
+solucion = asignar_backtracking(prefs)
 print('La mejor solucion es: ',solucion)
 print('El costo de la mejor solucion: ', solucion.calcular_costo())
+
 
                 
 
