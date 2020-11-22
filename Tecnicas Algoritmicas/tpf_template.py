@@ -166,27 +166,27 @@ def asignar_backtracking_aux(sol):
     else:
         # Todavia estan quedando estudiantes sin nigun topico asignado
         # Para cada estudiante sin topico recorro todos los topicos posibles que no esten asignados
-        for student in sol.estudiantes_sin_topico().copy():
+        student = min(sol.estudiantes_sin_topico())
 
-            for topic in sol.topicos_sin_estudiante().copy():
-                
-                sol.asignar(student, topic)
-                
-                # Introduzco la recursividad al rellamara la funcion                 
-                solucion_temp = asignar_backtracking_aux(sol)
-                
-                costo_temp = solucion_temp.calcular_costo()
+        for topic in sol.topicos_sin_estudiante().copy():
+            
+            sol.asignar(student, topic)
+            
+            # Introduzco la recursividad al rellamara la funcion                 
+            solucion_temp = asignar_backtracking_aux(sol)
+            
+            costo_temp = solucion_temp.calcular_costo()
 
-                # Si esta asignacion es la que menor costo reporta, la guardamos
-    
-                if costo_temp < costo:
-                   
-                   best_assignment = solucion_temp
-                   costo = costo_temp 
-                
-                # Paso para atras 
-    
-                sol.desasignar(student, topic)
+            # Si esta asignacion es la que menor costo reporta, la guardamos
+
+            if costo_temp < costo:
+               
+               best_assignment = solucion_temp
+               costo = costo_temp 
+            
+            # Paso para atras 
+
+            sol.desasignar(student, topic)
     return best_assignment
 
 #def testing_algoritmos():
