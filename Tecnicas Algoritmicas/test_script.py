@@ -56,74 +56,60 @@ def find_students_topics_to_change(solution, prefs):
 
 
 # Cargo un ejemplo de preferencias.
-prefs = Preferencias("Ejemplo50")
+prefs = Preferencias("Ejemplo3")
+sol = Planilla(prefs)
 
-# Determino una primera solucion con la heurísitica 'greedy'
-solucion_actual = asignar_greedy(prefs)
+def asignar_backtracking(sol):
 
-# Calculo el costo de la primera solucion
-costo_solucion_actual = solucion_actual.calcular_costo()
+    best_assignment = None
+    costo = float('inf')  # infinito
+    # Caso base: No queda ningun estudiante desasignado
 
-# Determino los estudiantes y topicos que voy a intercambiar
-students_to_change, topics_to_change = find_students_topics_to_change(solucion_actual, prefs)
+    if len(sol.estudiantes_sin_topico()) == 0:
 
-pudimos_mejorar = True
+        #print('No more students left')
+        best_assignment = sol.copy()
+        costo = best_assignment.calcular_costo()
 
-if costo_solucion_actual != 0:
-    while pudimos_mejorar:
+    else:
+        # Todavia estan quedando estudiantes sin nigun topico asignado
+
+        #print('There are still some students missing!')
+        for student in sol.estudiantes_sin_topico().copy():
+            print('Student: ', student)
+            for topic in sol.topicos_sin_estudiante().copy():
+                print('Topic: ', topic)
+                sol.asignar(student, topic)
+                print('Estudiante ', student, 'asignado al topico ')
+                solucion_temp = asignar_backtracking(sol)
+                costo_temp = solucion_temp.calcular_costo()
+
+                # Si esta asignacion es la que menor costo reporta, la guardamos
+
+                if costo_temp < costo:
+                   
+                   best_assignment = solucion_temp
+                   costo = costo_temp 
+                
+                # Paso para atras 
+
+                sol.desasignar(student, topic)
     
-        costo_mejor_vecino = float('inf')
-        mejor_vecino = None
-        
-        for student in range(0, len(students_to_change)-1):
-            
-            for topic in range(student+1,len(topics_to_change)):
+    return best_assignment
+
+
+solucion = asignar_backtracking(sol)
+print('La mejor solucion es: ',solucion)
+print('El costo de la mejor solucion: ', solucion.calcular_costo())
+
                 
-                vecino = solucion_actual.copy()
-                
-                # Encuentro el topico asignado al estudiante 'e'
-                # assigned_topic es EL topico, no es un indice
-                assigned_topic = vecino.topico_asignado_a_estudiante(students_to_change[student])
-                
-                # Desasigno el topico correspondiente al estudiante 'e'
-                vecino.desasignar(students_to_change[student], assigned_topic) 
-                
-                # Encuentro el estudiante asignado al 'topic'
-                # assigned_student es EL student, no es un indice 
-                assigned_student = vecino.estudiante_asignado_a_topico(topics_to_change[topic])
-                
-                # Desasigno el topico 'topic' del estudiante correspondiente
-                vecino.desasignar(assigned_student, topics_to_change[topic])
-                
-                # Intercambio los topicos entre el 'student' y el 'assigned_student'
-                # Asigno al student
-                vecino.asignar(students_to_change[student], topics_to_change[topic])
-                # Asigno al assigned_student
-                vecino.asignar(assigned_student, assigned_topic)
-                
-                # Calculo el costo de la nueva asignacion
-                costo = vecino.calcular_costo()
-                
-                if costo < costo_mejor_vecino:
-                    costo_mejor_vecino = costo
-                    mejor_vecino = vecino
-                
-        # Si el mejor vecino encontrado es mejor que la solución actual,
-        # lo guardamos y seguimos buscando. Si no, terminamos.
-        
-        if costo_mejor_vecino < costo_solucion_actual:
-            print('Costo solucion actual: ', costo_solucion_actual)
-            print('Costo mejor vecino: ', costo_mejor_vecino)
-            pudimos_mejorar = True
-            solucion_actual = mejor_vecino
-            costo_solucion_actual = costo_mejor_vecino
-            # Vuelvo a encontrar los estudiantes que intercambiaran topicos
-            students_to_change, topics_to_change = find_students_topics_to_change(solucion_actual, prefs)
-        else:
-            pudimos_mejorar = False
-        
-else:
-    print('La solucion ya es optima!')
+
+
+
+
+
+
+
 
     
     
