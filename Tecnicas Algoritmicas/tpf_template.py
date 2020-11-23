@@ -46,11 +46,12 @@ def asignar_random(prefs):
 def asignar_greedy(prefs):
     
     sol = Planilla(prefs)
-    
+    #Recorro todos los estudiantes uno a uno
     for student in sol.estudiantes_sin_topico():
-                
+      #Recorro las preferencias del estudiante en cuestión por orden
+      #de preferencia          
         for topic in prefs.preferencias_del_estudiante(student):
-    
+            #Asigno al estudiante el primer tópico desocupado 
             if sol.topico_libre(topic) and sol.estudiante_libre(student):                
                 sol.asignar(student, topic)
     return sol
@@ -129,7 +130,7 @@ def asignar_bli(prefs, iters):
     solucion_final = None
 
     for iteration in range(0, iters):
-        print('Iteration number: ', iteration)
+        #print('Iteration number: ', iteration)
         solucion_actual = asignar_random(prefs)
         solucion_bl = asignar_bl(prefs, solucion_actual)
 
@@ -189,72 +190,84 @@ def asignar_backtracking_aux(sol):
             sol.desasignar(student, topic)
     return best_assignment
 
-#def testing_algoritmos():
+#El argumento debe ser el nombre de una secuencia de preferencias
+#Por ejemplo "Ejemplo3"
+def testing_algoritmos(example):
 
-examples = ['Ejemplo3', 'Ejemplo5', 'Ejemplo10', 'Ejemplo12', 'Ejemplo15', 'Ejemplo50']
-results = {}
+ results = {}
 
-for example in examples:
 
-    # Cargo un ejemplo de preferencias.
-    prefs = Preferencias(example)
+  # Cargo un ejemplo de preferencias.
+ prefs = Preferencias(example)
+  # Busco una asignación completa (con un algoritmo aleatorio en este caso),
+  # calculando el tiempo de ejecución.
 
-    # Busco una asignación completa (con un algoritmo aleatorio en este caso),
-    # calculando el tiempo de ejecución.
+  # Random Algorithm
 
-    # Random Algorithm
-
-    comienzo = datetime.now()
-    solucion = asignar_random(prefs)
-    tiempo_usado = datetime.now() - comienzo
-    results[example] = {'Random Algorithm':{'Costo': solucion.calcular_costo(),
+ comienzo = datetime.now()
+ solucion = asignar_random(prefs)
+ tiempo_usado = datetime.now() - comienzo
+ results[example] = {'Random Algorithm':{'Costo': solucion.calcular_costo(),
                                             'Tiempo usado': tiempo_usado}}
 
-    # Greedy Algorithm
+  # Greedy Algorithm
 
-    comienzo = datetime.now()
-    solucion = asignar_greedy(prefs)
-    tiempo_usado = datetime.now() - comienzo
-    results[example].update({'Greedy Algorithm':{'Costo': solucion.calcular_costo(),
+ comienzo = datetime.now()
+ solucion = asignar_greedy(prefs)
+ tiempo_usado = datetime.now() - comienzo
+ results[example].update({'Greedy Algorithm':{'Costo': solucion.calcular_costo(),
                                             'Tiempo usado': tiempo_usado}})
 
-    # Busqueda Local Algorithm
+  # Busqueda Local Algorithm
 
-    # Determino una primera solucion con la heurísitica 'greedy'
-    comienzo = datetime.now()
-    solucion_actual = asignar_greedy(prefs)
-    solucion_bl = asignar_bl(prefs, solucion_actual)
-    tiempo_usado = datetime.now() - comienzo
-    results[example].update({'Bl Algorithm':{'Costo': solucion_bl.calcular_costo(),
+  # Determino una primera solucion con la heurísitica 'greedy'
+ comienzo = datetime.now()
+ solucion_actual = asignar_greedy(prefs)
+ solucion_bl = asignar_bl(prefs, solucion_actual)
+ tiempo_usado = datetime.now() - comienzo
+ results[example].update({'Bl Algorithm':{'Costo': solucion_bl.calcular_costo(),
                                             'Tiempo usado': tiempo_usado}})
 
     # Busqueda Local Iterativa Algorithm
 
-    comienzo = datetime.now()
-    solucion = asignar_bli(prefs, 50)
-    tiempo_usado = datetime.now() - comienzo
-    results[example].update({'Bli Algorithm':{'Costo': solucion.calcular_costo(),
+ comienzo = datetime.now()
+ solucion = asignar_bli(prefs, 50)
+ tiempo_usado = datetime.now() - comienzo
+ results[example].update({'Bli Algorithm':{'Costo': solucion.calcular_costo(),
                                             'Tiempo usado': tiempo_usado}})
+        
+ return(results)
+  
+#Se construye una function similar para backtracking
+
+def testing_back(example):
     
-    
+ results = {}
 
-print(results)
+ prefs = Preferencias(example)
 
+ comienzo = datetime.now()
+ solucion = asignar_backtracking(prefs)
+ tiempo_usado = datetime.now() - comienzo
+ results[example] = {'Backtracking Algorithm':{'Costo': solucion.calcular_costo(),
+                                            'Tiempo usado': tiempo_usado}}
+ 
+ return(results)
 
+def main():
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    examples = ['Ejemplo3', 'Ejemplo5', 'Ejemplo10', 'Ejemplo12', 'Ejemplo15', 'Ejemplo50']
 
-# Cargo un ejemplo de preferencias.
-#prefs = Preferencias("Ejemplo50")
+    results = {}
+    results_bt = {}
 
-# Busco una asignación completa (con un algoritmo aleatorio en este caso),
-# calculando el tiempo de ejecución.
-#comienzo = datetime.now()
-#solucion = asignar_greedy(prefs)
-#tiempo_usado = datetime.now() - comienzo
+    for example in examples:
 
-# Imprimo un resumen de los resultados.
-#print("Preferencias", prefs)
-#print("Solución:", solucion)
-#print("Costo:", solucion.calcular_costo())
-#print("Tiempo:", tiempo_usado)
+        results.update(testing_algoritmos(example))
+        results_bt.update(testing_back(example))
+
+    print(results)
+    print(results_bt)
+
+if __name__ == '__main__':
+    main()
