@@ -5,9 +5,10 @@ import pandas
 import pyarrow
 import pyarrow.parquet as pq
 import requests
+from unidecode import unidecode
 
 
-table2 = pq.read_table(r'C:\Users\Emi\Desktop\MLA57250.parquet')
-new_df = table2.to_pandas()
+string = 'HolA t#ód?o b+íen'
 
-print(new_df.Dis.value_counts())
+print(string.lower())
+print(unidecode(string))
