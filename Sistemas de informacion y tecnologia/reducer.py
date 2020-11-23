@@ -35,8 +35,8 @@ def reduce_function(buffer, totals):
     category = buffer[0][1]
     term = buffer[0][0]
 
-    totals['positive'][category][term] == total_positive
-    totals['negative'][category][term] == total_negative
+    totals['positive'][category][term] = total_positive
+    totals['negative'][category][term] = total_negative
 
 def calculate_tfs(totals):
     """
@@ -78,7 +78,7 @@ def calculate_tfs_idfs(tfs, term_buckets, term_categories):
     """
     tf_idfs = {}
     n_buckets = len(tfs)
-    n_categories = len(list(tfs.values())[0])
+    #n_categories = len(list(tfs.values())[0])
     n_categories = {'positive': len(tfs['positive'].keys()),
                     'negative': len(tfs['negative'].keys())}
 
@@ -155,10 +155,10 @@ def main():
 
     tf_idfs = merge(totals)
 
-    #for bucket, bucket_tf_idfs in tf_idfs.items():
-    #    for category, category_tf_idfs in bucket_tf_idfs.items():
-    #        sorted_scores = sorted(category_tf_idfs.items(), key=lambda x: x[1], reverse=True)
-    #        write_csv(category, bucket, sorted_scores)
+    for bucket, bucket_tf_idfs in tf_idfs.items():
+        for category, category_tf_idfs in bucket_tf_idfs.items():
+            sorted_scores = sorted(category_tf_idfs.items(), key=lambda x: x[1], reverse=True)
+            write_csv(category, bucket, sorted_scores)
 
 
 if __name__ == '__main__':
