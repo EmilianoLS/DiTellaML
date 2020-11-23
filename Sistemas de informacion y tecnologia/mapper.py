@@ -69,7 +69,7 @@ def accept(term):
     """
     # TODO implementar acá un filtro que devuelve True sólo para las palabras de interés,
     #      por ejemplo, eliminando STOPWORDS o filtrando sólo palabras alfanuméricas.
-    if term in spanish_stopwords:
+    if term in spanish_stopwords or term == '':
         
         return False
 
@@ -86,10 +86,11 @@ def sanitize(word):
     :return: sanitized word
     """
     # TODO: normalizar la palabra aquí, por ejemplo pasar a minúsculas y eliminar espacios extra
-    word = word.lower()
-    word = re.sub(r'[^\w\s]', '', word) 
-    word = unidecode(word)
-    word = word.strip()
+    word = word.lower()                         # Vuelve todo minuscula
+    word = unidecode(word)                      # Quita tildes
+    word = ''.join(word.split())                # Quita todos los espacios
+    alphanumeric = filter(str.isalnum, word)    # Quita caracteres no alfanumericos
+    word = ''.join(alphanumeric)            
 
     return word
 

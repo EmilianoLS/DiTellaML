@@ -18,7 +18,25 @@ def reduce_function(buffer, totals):
     #       totals es un diccionario donde la clave es cada bucket, y el valor es un diccionario
     #       de categorías a un diccionario de términos y cantidades:
     #       totals[bucket][category][term] está asociado a un número entero
-    pass # <-- borrar esto
+
+    total_positive = 0
+    total_negative = 0
+    
+    for element in buffer:
+
+        if element[2] == 'positive':
+
+            total_positive += 1
+        
+        else:
+
+            total_negative += 1
+        
+    category = buffer[0][1]
+    term = buffer[0][0]
+
+    totals['positive'][category][term] == total_positive
+    totals['negative'][category][term] == total_negative
 
 def calculate_tfs(totals):
     """
@@ -61,13 +79,33 @@ def calculate_tfs_idfs(tfs, term_buckets, term_categories):
     tf_idfs = {}
     n_buckets = len(tfs)
     n_categories = len(list(tfs.values())[0])
+    n_categories = {'positive': len(tfs['positive'].keys()),
+                    'negative': len(tfs['negative'].keys())}
+
+
     for bucket, bucket_tfs in tfs.items():
         tf_idfs[bucket] = {}
         for category, category_tfs in bucket_tfs.items():
             tf_idfs[bucket][category] = {}
             for term, tf in category_tfs.items():
+                tot_categories = n_categories[bucket]
+
+                # Encuentro las categorias que contienen el termino. Esto lo puedo sacar de term_categories
+                # El problema es que puede ser que un termino este en una categoria del bucket opuesto por lo 
+                # que no deberia contar esa categoria para el idf ya que estoy contando las categorias que contienen
+                # el termino DENTRO de un mismo bucket
+
+                categories_with_term = set(term_categories[term]).intersection(set(tfs[bucket].keys()))
+
+                # Calculo idf
+
+                idf = math.log(tot_categories/len(categories_with_term))
+
+                # Cargo al diccionario
+
+                tf_idfs[bucket][category][term] = tfs[bucket][category][term]*idf
                 # TODO aquí deben calcular el tfs/idfs del bucket, categoría y término y volcarlo en el diccionario tf_idfs
-                pass # <-- borrar esto
+                
 
     return tf_idfs
 
@@ -117,10 +155,10 @@ def main():
 
     tf_idfs = merge(totals)
 
-    for bucket, bucket_tf_idfs in tf_idfs.items():
-        for category, category_tf_idfs in bucket_tf_idfs.items():
-            sorted_scores = sorted(category_tf_idfs.items(), key=lambda x: x[1], reverse=True)
-            write_csv(category, bucket, sorted_scores)
+    #for bucket, bucket_tf_idfs in tf_idfs.items():
+    #    for category, category_tf_idfs in bucket_tf_idfs.items():
+    #        sorted_scores = sorted(category_tf_idfs.items(), key=lambda x: x[1], reverse=True)
+    #        write_csv(category, bucket, sorted_scores)
 
 
 if __name__ == '__main__':
