@@ -42,9 +42,20 @@ for bucket, bucket_totals in totals.items():
                 term_categories[term] = set()
             term_categories[term].add(category)
 
-print('TFS')
 
-print(set(tfs['negative'].keys()))
+dictionary = {}
+dicta = {'catA': 15}
+dictb = {'catB':70}
+
+dictionary['positive'] = {}
+
+dictionary['positive']['MLA100'] = {}
+dictionary['positive']['MLA100'].update({'bueno':11})
+
+dictionary['positive']['MLA100'].update({'malo':15})
+#dictionary['positive']['MLA100'].update({'malo':10})
+
+print(dictionary)
 
 #print(term_categories)
 #total_occurences_positive = 0

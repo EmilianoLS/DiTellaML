@@ -22,8 +22,15 @@ def reduce_function(buffer, totals):
     total_positive = 0
     total_negative = 0
     
+    # Primeramente recorro todo el buffer. En la teoria, cada vez que llegue un buffer, va a corresponder a 
+    # un mismo termino, y a una misma categoria, lo que va a variar es si esta asociado a un bucket 
+    # positivo o negativo
+    # Por lo tanto lo que voy a hacer es contar cuantas veces aparece el termino en esta categoria
+    # en un bucket y en el otro
     for element in buffer:
-
+        # Primero chequeo el bucket al que pertenece:
+            # Si es positivo, entonces incremento el contador del bucket positivo
+            # Si es negativo, entonces incremento el contador del bucket negativo
         if element[2] == 'positive':
 
             total_positive += 1
@@ -31,12 +38,58 @@ def reduce_function(buffer, totals):
         else:
 
             total_negative += 1
-        
+    
+    # Una vez recorrido todo el buffer y ya conté todas las apariciones del term en la categoria
+    # entonces puedo extraer la categoria y el term para poder actualizar el diccionario
     category = buffer[0][1]
     term = buffer[0][0]
+    print(category)
+    print(term)
+    # Para actualizar el diccionario, es importante entender:
+    #   1)  Si el diccionario esta vacio (caso del primer loop del for que llama a esta funcion). 
+    #       En ese caso, se debe crear el diccionario con los buckets, y actualizarlo incorporando la categoria y el term
+    #   2)  Si la categoria ya se encuentra en el diccionario. Si no es asi, entonces se debe crear, e incorporar el term
+    #   3)  Si la categoria ya existe, entonces solo queda actualizar el diccionario con el nuevo term
 
-    totals['positive'][category][term] = total_positive
-    totals['negative'][category][term] = total_negative
+    if not totals: # Si el diccionario esta vacio
+        # Creo la key para el bucket positive
+        totals['positive'] = {}
+
+        # Agrego la category al diccionario, asi como también el term
+        totals['positive'][category] = {}
+
+        if total_positive != 0:
+            totals['positive'][category].update({term : total_positive})
+
+        # Creo la key para el bucket positive
+        totals['negative'] = {}
+
+        # Agrego la category al diccionario, asi como también el term
+        totals['negative'][category] = {}
+
+        if total_negative != 0:
+            totals['negative'][category].update({term : total_negative})
+    
+    elif (category not in totals['positive'].keys()) or (category not in totals['positive'].keys()): # Si la categoria no existe en el diccionario
+        
+        totals['positive'][category] = {}
+
+        if total_positive != 0:
+            totals['positive'][category].update({term : total_positive})
+
+        totals['negative'][category] = {}
+
+        if total_negative != 0:
+            totals['negative'][category].update({term : total_negative})
+    
+    else:
+        
+        if total_positive != 0:
+            totals['positive'][category].update({term : total_positive})
+
+        if total_negative != 0:
+            totals['negative'][category].update({term : total_negative})
+
 
 def calculate_tfs(totals):
     """
