@@ -43,8 +43,6 @@ def reduce_function(buffer, totals):
     # entonces puedo extraer la categoria y el term para poder actualizar el diccionario
     category = buffer[0][1]
     term = buffer[0][0]
-    print(category)
-    print(term)
     # Para actualizar el diccionario, es importante entender:
     #   1)  Si el diccionario esta vacio (caso del primer loop del for que llama a esta funcion). 
     #       En ese caso, se debe crear el diccionario con los buckets, y actualizarlo incorporando la categoria y el term
